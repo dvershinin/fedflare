@@ -18,6 +18,6 @@ jobs:
       - run: |
           pip install -r requirements.txt
       - name: Run sync
-        shell: fedflare epel.cloud
-        env: # Or as an environment variable
+        run: fedflare epel.cloud
+        with: # Or as an environment variable
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
