@@ -39,16 +39,10 @@ def main():
     except Exception as e:
         exit('/zones.get - %s - api call failed' % (e))
 
+    zone_id = None
     # there should only be one zone
     for zone in sorted(zones, key=lambda v: v['name']):
-        zone_name = zone['name']
         zone_id = zone['id']
-        zone_type = zone['type']
-        if 'email' in zone['owner']:
-            zone_owner = zone['owner']['email']
-        else:
-            zone_owner = '"' + zone['owner']['name'] + '"'
-        zone_plan = zone['plan']['name']
 
     invalidate_urls = []
 
@@ -73,7 +67,6 @@ def main():
                         invalidate_urls.append(alias_repomd_url)
                     print(f"Detected change on epel/{repomd_uri}")
                 # simply request both and compare Last-Modified. If different, need to purge!
-        print(f"Must invalidate: {invalidate_urls}")
         # split in batches of 30 URLs, as single purge request only allows up to 30
         # see here: https://community.cloudflare.com/t/suddenly-cannot-purge-more-than-30-files-on-a-single-request/188756
         url_chunks = list(divide_chunks(invalidate_urls, 30))
