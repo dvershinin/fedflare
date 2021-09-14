@@ -20,5 +20,4 @@ jobs:
       - name: Run sync
         run: fedflare epel.cloud
         env: # Or as an environment variable
-          CF_API_EMAIL: ${{ secrets.CF_API_EMAIL }}
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
