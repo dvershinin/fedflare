@@ -18,3 +18,5 @@ jobs:
       - run: |
           pip install -r requirements.txt
           fedflare epel.cloud
+        env: # Or as an environment variable
+          super_secret: ${{ secrets.SuperSecret }}
