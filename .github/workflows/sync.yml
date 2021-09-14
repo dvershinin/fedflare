@@ -25,4 +25,4 @@ jobs:
         env:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
         run: |
-          fedflare  ${{ secrets.LIVE_DOMAIN }}
+          fedflare epel.cloud
