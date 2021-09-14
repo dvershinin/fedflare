@@ -58,7 +58,7 @@ def main():
                     alias_repomd_url = f"https://{args.domain}/pub/epel/{dist['alias']}/{repo}/repodata/repomd.xml"
                 repomd_fedora_url = f"https://dl.fedoraproject.org/{repomd_uri}"
                 repomd_cloud_url = f"https://{args.domain}/{repomd_uri}"
-                r_live = s.head(repomd_fedora_url)
+                r_live = s.head(repomd_fedora_url, timeout=5)
                 r_cloud = s.head(repomd_cloud_url)
                 synced = r_live.headers['last-modified'] == r_cloud.headers['last-modified']
                 if not synced:
