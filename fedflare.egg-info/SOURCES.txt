@@ -1,0 +1,12 @@
+README.md
+setup.py
+fedflare/__about__.py
+fedflare/__init__.py
+fedflare/fedora.py
+fedflare.egg-info/PKG-INFO
+fedflare.egg-info/SOURCES.txt
+fedflare.egg-info/dependency_links.txt
+fedflare.egg-info/entry_points.txt
+fedflare.egg-info/not-zip-safe
+fedflare.egg-info/requires.txt
+fedflare.egg-info/top_level.txt

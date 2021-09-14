@@ -1,0 +1,21 @@
+Metadata-Version: 2.1
+Name: fedflare
+Version: 1.6.0
+Summary: A CLI tool to find the latest stable version of an arbitrary project
+Home-page: https://github.com/dvershinin/fedflare
+Author: Danila Vershinin
+Author-email: info@getpagespeed.com
+License: BSD
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Software Development
+Classifier: Topic :: Utilities
+Description-Content-Type: text/markdown
+Provides-Extra: tests
+Provides-Extra: docs
+Provides-Extra: build
+
+UNKNOWN
+

@@ -1,0 +1,14 @@
+
+[build]
+mkdocs==1.2.1
+mkdocs-material
+mkdocstrings
+markdown-include
+
+[docs]
+mkdocs==1.2.1
+mkdocs-material
+mkdocstrings
+markdown-include
+
+[tests]
