@@ -18,6 +18,8 @@ jobs:
       - run: |
           pip install -r requirements.txt
           cat ${{ secrets.CF_API_KEY }}
+        env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
       - shell: bash
         env:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
