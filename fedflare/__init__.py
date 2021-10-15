@@ -30,7 +30,7 @@ def main():
     args = parser.parse_args()
 
     cf = CloudFlare.CloudFlare()
-    print(args.domain)
+
     # grab the zone identifier
     try:
         zones = cf.zones.get(params={'name': args.domain, 'per_page' : 1})
@@ -60,7 +60,9 @@ def main():
                 repomd_cloud_url = f"https://{args.domain}/{repomd_uri}"
                 r_live = s.head(repomd_fedora_url, timeout=5)
                 r_cloud = s.head(repomd_cloud_url)
-                synced = r_live.headers['last-modified'] == r_cloud.headers['last-modified']
+                synced = False
+                if 'last-modified' in r_live.headers and 'last-modified' in r_cloud.headers:
+                    synced = r_live.headers['last-modified'] == r_cloud.headers['last-modified']
                 if not synced:
                     invalidate_urls.append(repomd_cloud_url)
                     if alias_repomd_url:
