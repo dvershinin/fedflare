@@ -3,7 +3,6 @@ import CloudFlare
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
-from .fedora import projects
 
 
 def divide_chunks(l, n):
@@ -33,7 +32,7 @@ def main():
 
     # grab the zone identifier
     try:
-        zones = cf.zones.get(params={'name': args.domain, 'per_page' : 1})
+        zones = cf.zones.get(params={'name': args.domain, 'per_page': 1})
     except CloudFlare.exceptions.CloudFlareAPIError as e:
         exit('/zones %d %s - api call failed' % (e, e))
     except Exception as e:
@@ -50,24 +49,36 @@ def main():
         retry = Retry(connect=3, read=3, backoff_factor=0.5, status_forcelist=[500, 502, 503, 504])
         adapter = HTTPAdapter(max_retries=retry)
         s.mount('https://', adapter)
-        for name, dist in projects['epel'].items():
-            for repo in dist['repos']:
-                repomd_uri = f"pub/epel/{name}/{repo}/repodata/repomd.xml"
-                alias_repomd_url = None
-                if 'alias' in dist:
-                    alias_repomd_url = f"https://{args.domain}/pub/epel/{dist['alias']}/{repo}/repodata/repomd.xml"
-                repomd_fedora_url = f"https://dl.fedoraproject.org/{repomd_uri}"
-                repomd_cloud_url = f"https://{args.domain}/{repomd_uri}"
-                r_live = s.head(repomd_fedora_url, timeout=5)
-                r_cloud = s.head(repomd_cloud_url)
-                synced = False
-                if 'last-modified' in r_live.headers and 'last-modified' in r_cloud.headers:
-                    synced = r_live.headers['last-modified'] == r_cloud.headers['last-modified']
-                if not synced:
-                    invalidate_urls.append(repomd_cloud_url)
-                    if alias_repomd_url:
-                        invalidate_urls.append(alias_repomd_url)
-                    print(f"Detected change on epel/{repomd_uri}")
+        s.headers.update({'User-Agent': 'libdnf'})
+
+        dirs_url = "https://dl.fedoraproject.org/pub/DIRECTORY_SIZES.txt"
+        dirs_r = s.get(dirs_url, timeout=5)
+        all_repodata_uris = []
+
+        for line in dirs_r.text.splitlines():
+            if 'repodata' in line:
+                repodata_uri = line.split()[-1].strip()
+                if repodata_uri.startswith('/pub/epel/'):
+                    # Only EPEL repos
+                    all_repodata_uris.append(repodata_uri)
+
+        for repodata_uri in all_repodata_uris:
+            print(f"Checking repomd.xml for freshness at repo {repodata_uri}", end=" ")
+            repomd_uri = f"{repodata_uri}/repomd.xml"
+            repomd_fedora_url = f"https://dl.fedoraproject.org{repomd_uri}"
+            repomd_cloud_url = f"https://{args.domain}{repomd_uri}"
+            r_live = s.head(repomd_fedora_url, timeout=5)
+            r_cloud = s.head(repomd_cloud_url)
+            synced = False
+            if 'last-modified' in r_live.headers and 'last-modified' in r_cloud.headers:
+                synced = r_live.headers['last-modified'] == r_cloud.headers['last-modified']
+            if not synced:
+                invalidate_urls.append(repomd_cloud_url)
+                print(f"Detected change on {repomd_uri}")
+            else:
+                print("Fresh")
+            s.get(repomd_cloud_url)
+
                 # simply request both and compare Last-Modified. If different, need to purge!
         # split in batches of 30 URLs, as single purge request only allows up to 30
         # see here: https://community.cloudflare.com/t/suddenly-cannot-purge-more-than-30-files-on-a-single-request/188756
@@ -82,3 +93,11 @@ def main():
                     data={'files': urls}
                 )
                 print(r)
+
+        # warm up job
+        for repodata_uri in all_repodata_uris:
+            url = f"https://{args.domain}{repodata_uri}/repomd.xml"
+            print(f"Warming {url}")
+            warm_r = s.get(url)
+            print(warm_r.headers['cf-cache-status'])
+

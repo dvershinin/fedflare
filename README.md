@@ -1,3 +1,12 @@
+# fedflare
+
+Python-based CLI app for cache invalidation and warm up for a Cloudflare mirror of Fedora repositories.
+
+The `fedflare` CLI program:
+
+* invalidates *changed* `repomd.xml` files, ensuring that Cloudflare mirror is always fresh
+* warms up Cloudflare's `repomd.xml` copy (currently limited feature, because it warms up from a single location only)
+
 ## Use epel.cloud
 
 Install epel-release with CDN base URLs in lieu of standard releases packages.
