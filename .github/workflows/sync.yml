@@ -1,4 +1,4 @@
-name: Install and runc syncing
+name: Install and run syncing
 on:
   # Trigger the workflow on push or pull request,
   # but only for the main branch
@@ -6,7 +6,7 @@ on:
     branches:
       - main
   schedule:
-    # * is a special character in YAML so you have to quote this string
+    # * is a special character in YAML, so you have to quote this string
     - cron:  '0/5 * * * *'
 jobs:
   sync:
@@ -26,3 +26,4 @@ jobs:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
         run: |
           fedflare epel.cloud
+      - uses: gautamkrishnar/keepalive-workflow@v1

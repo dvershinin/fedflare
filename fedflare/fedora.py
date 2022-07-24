@@ -3,12 +3,15 @@ projects = {
         "7": {"alias": "7Server"},
         "8/Everything": {},
         "8/Modular": {},
+        "9/Everything": {},
         "next/8/Everything": {},
+        "next/9/Everything": {},
         "playground/8/Everything": {},
         "testing/7": {},
         "testing/8/Everything": {},
         "testing/8/Modular": {},
         "testing/next/8/Everything": {},
+        "testing/9/Everything": {},
     }
 }
 
@@ -24,7 +27,7 @@ archs = [
 for project in projects['epel']:
     project_archs = archs.copy()
     project_repos = []
-    if '8' in project:
+    if '8' in project or '9' in project:
         project_archs.remove('ppc64')
     if not project.startswith('playground/8/'):
         project_repos.append('SRPMS')
