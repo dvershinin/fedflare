@@ -99,5 +99,8 @@ def main():
             url = f"https://{args.domain}{repodata_uri}/repomd.xml"
             print(f"Warming {url}")
             warm_r = s.get(url)
+            if 'cf-cache-status' not in warm_r.headers:
+                print(f"cf-cache-status not found in headers: {warm_r.headers}")
+                exit(1)
             print(warm_r.headers['cf-cache-status'])
 
