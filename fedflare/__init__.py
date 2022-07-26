@@ -69,19 +69,17 @@ def main():
             repomd_cloud_url = f"https://{args.domain}{repomd_uri}"
             r_live = s.head(repomd_fedora_url, timeout=5)
             r_cloud = s.head(repomd_cloud_url)
-            synced = False
-            if 'last-modified' in r_live.headers and 'last-modified' in r_cloud.headers:
-                synced = r_live.headers['last-modified'] == r_cloud.headers['last-modified']
-            if not synced:
+
+            # simply request both and compare Last-Modified. If different, need to purge!
+            if r_live.headers['last-modified'] != r_cloud.headers['last-modified']:
                 invalidate_urls.append(repomd_cloud_url)
                 print(f"Detected change on {repomd_uri}")
             else:
-                print("Fresh")
+                print(f"Fresh {r_live.headers['last-modified']}")
             s.get(repomd_cloud_url)
 
-                # simply request both and compare Last-Modified. If different, need to purge!
-        # split in batches of 30 URLs, as single purge request only allows up to 30
-        # see here: https://community.cloudflare.com/t/suddenly-cannot-purge-more-than-30-files-on-a-single-request/188756
+        # split in batches of 30 URLs, as single purge request only allows up to 30 see here:
+        # https://community.cloudflare.com/t/suddenly-cannot-purge-more-than-30-files-on-a-single-request/188756
         url_chunks = list(divide_chunks(invalidate_urls, 30))
         if not url_chunks:
             print('All was synced already')
@@ -97,10 +95,13 @@ def main():
         # warm up job
         for repodata_uri in all_repodata_uris:
             url = f"https://{args.domain}{repodata_uri}/repomd.xml"
-            print(f"Warming {url}")
+            print(f"Warming {url}", end=" ")
             warm_r = s.get(url)
             if 'cf-cache-status' not in warm_r.headers:
                 print(f"cf-cache-status not found in headers: {warm_r.headers}")
                 exit(1)
+            if warm_r.headers['cf-cache-status'] == 'DYNAMIC':
+                print('Got DYNAMIC cache status. Is Cache Everything rule active?')
+                exit(2)
             print(warm_r.headers['cf-cache-status'])
 
