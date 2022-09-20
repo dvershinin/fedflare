@@ -71,7 +71,10 @@ def main():
             r_cloud = s.head(repomd_cloud_url)
 
             # simply request both and compare Last-Modified. If different, need to purge!
-            if r_live.headers['last-modified'] != r_cloud.headers['last-modified']:
+            if 'last-modified' not in r_live.headers or 'last-modified' not in r_cloud.headers:
+                invalidate_urls.append(repomd_cloud_url)
+                print(f"Detected change (last-modified missing) on {repomd_uri}")
+            elif r_live.headers['last-modified'] != r_cloud.headers['last-modified']:
                 invalidate_urls.append(repomd_cloud_url)
                 print(f"Detected change on {repomd_uri}")
             else:
