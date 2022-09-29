@@ -52,7 +52,7 @@ def main():
         s.headers.update({'User-Agent': 'libdnf'})
 
         dirs_url = "https://dl.fedoraproject.org/pub/DIRECTORY_SIZES.txt"
-        dirs_r = s.get(dirs_url, timeout=5)
+        dirs_r = s.get(dirs_url, timeout=30)
         all_repodata_uris = []
 
         for line in dirs_r.text.splitlines():
