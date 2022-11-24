@@ -3,6 +3,7 @@ import CloudFlare
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
+import time
 
 
 def divide_chunks(l, n):
@@ -102,7 +103,13 @@ def main():
             # python-requests on Keep-Alive:
             # Note that connections are only released back to the pool for reuse once all body data has been read;
             # be sure to either set stream to False or read the content property of the Response object.
-            warm_r = s.get(url, stream=False)
+            try:
+                warm_r = s.get(url, stream=False)
+            except requests.exceptions.ChunkedEncodingError:
+                # just repeat on a broken connection
+                time.sleep(1)
+                warm_r = s.get(url, stream=False)
+
             if 'cf-cache-status' not in warm_r.headers:
                 print(f"cf-cache-status not found in headers: {warm_r.headers}")
                 exit(1)
@@ -110,4 +117,3 @@ def main():
                 print('Got DYNAMIC cache status. Is Cache Everything rule active?')
                 exit(2)
             print(warm_r.headers['cf-cache-status'])
-
