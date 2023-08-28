@@ -1,0 +1,11 @@
+[Unit]
+Description=Sync Cloudflare Mirror of EPEL repos
+
+[Service]
+ExecStart=/home/builder/fedflare/venv/bin/fedflare epel.cloud
+Restart=always
+Type=simple
+User=builder
+
+[Install]
+WantedBy=multi-user.target
