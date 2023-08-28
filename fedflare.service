@@ -1,11 +1,10 @@
 [Unit]
 Description=Sync Cloudflare Mirror of EPEL repos
-StartLimitIntervalSec=0
 
 [Service]
 ExecStart=/home/builder/fedflare/venv/bin/fedflare epel.cloud
 Restart=always
-RestartSec=500ms
+RestartSec=3s
 Type=simple
 User=builder
 
