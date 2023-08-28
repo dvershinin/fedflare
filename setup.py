@@ -14,6 +14,13 @@ import re
 _version_re = re.compile(r"__version__\s=\s'(.*)'")
 
 install_requires = [
+    # Cachecontrol 0.12.12 uses filelock instead of lockfile, and reverts to lockfile in 0.12.14.
+    # Newer versions use filelock, but most distros package cachecontrol 0.12.11.
+    # Ideally we can specify 0.12.14, but pip doesn't allow this, so just pin to what we can
+    'cachecontrol<=0.12.11',
+    'lockfile',
+    # pin due to https://github.com/ionrock/cachecontrol/issues/292
+    'urllib3 < 2',
     "cloudflare"
 ]
 tests_requires = []

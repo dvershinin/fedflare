@@ -1,6 +1,10 @@
 import argparse
+import os
+
 import CloudFlare
 import requests
+from cachecontrol import CacheControl
+from cachecontrol.caches import FileCache
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 import time
@@ -46,16 +50,25 @@ def main():
 
     invalidate_urls = []
 
-    with requests.Session() as s:
+    with requests.Session() as uncached_session:
         retry = Retry(connect=3, read=3, backoff_factor=0.5, status_forcelist=[500, 502, 503, 504])
         adapter = HTTPAdapter(max_retries=retry)
-        s.mount('https://', adapter)
+        uncached_session.mount('https://', adapter)
+        # Use CacheControl to wrap the session
+        # Create or ensure the cache directory exists
+        cache_dir = os.path.expanduser("~/.cache/fedlare")
+        if not os.path.exists(cache_dir):
+            os.makedirs(cache_dir)
+        s = CacheControl(uncached_session, cache=FileCache(cache_dir))
         s.headers.update({'User-Agent': 'libdnf'})
 
         dirs_url = "https://dl.fedoraproject.org/pub/DIRECTORY_SIZES.txt"
         dirs_r = s.get(dirs_url, timeout=30)
-        all_repodata_uris = []
+        if dirs_r.from_cache:
+            print('DIRECTORY_SIZES.txt unchanged, so repositories have not changed. Nothing to do, exiting.')
+            exit(0)
 
+        all_repodata_uris = []
         for line in dirs_r.text.splitlines():
             if 'repodata' in line:
                 repodata_uri = line.split()[-1].strip()
@@ -67,20 +80,19 @@ def main():
             print(f"Checking repomd.xml for freshness at repo {repodata_uri}", end=" ")
             repomd_uri = f"{repodata_uri}/repomd.xml"
             repomd_fedora_url = f"https://dl.fedoraproject.org{repomd_uri}"
+            # comparing to cloud URL's last-modified is wrong because maybe we hit one edge where it's cached with
+            # proper date while on another edge it's outdated
+            # that would result in not purging the cache when it should be purged,
+            # so again we use CacheControl to detect changes
             repomd_cloud_url = f"https://{args.domain}{repomd_uri}"
-            r_live = s.head(repomd_fedora_url, timeout=5)
-            r_cloud = s.head(repomd_cloud_url)
+            r_live = s.get(repomd_fedora_url, timeout=5)
 
             # simply request both and compare Last-Modified. If different, need to purge!
-            if 'last-modified' not in r_live.headers or 'last-modified' not in r_cloud.headers:
+            if not r_live.from_cache:
                 invalidate_urls.append(repomd_cloud_url)
-                print(f"Detected change (last-modified missing) on {repomd_uri}")
-            elif r_live.headers['last-modified'] != r_cloud.headers['last-modified']:
-                invalidate_urls.append(repomd_cloud_url)
-                print(f"Detected change on {repomd_uri}")
+                print(f"Detected change (uncached) on {repomd_uri}")
             else:
-                print(f"Fresh {r_live.headers['last-modified']}")
-            s.get(repomd_cloud_url)
+                print("No change")
 
         # split in batches of 30 URLs, as single purge request only allows up to 30 see here:
         # https://community.cloudflare.com/t/suddenly-cannot-purge-more-than-30-files-on-a-single-request/188756

@@ -26,10 +26,8 @@ in sync with actual Fedora repositories.
 
 ## How this works
 
-This script requests every repo's repomd.xml from Cloudflare and Fedora servers, and compares their 
-`Last-Modified` response headers. 
-Different values will mean that the `repomd.xml` will be added to the batch for
-purging on Cloudflare.
+This script requests every repo's repomd.xml from Fedora servers, and then caches it locally. 
+Changes in cache state for a repomd.xml will mean that the repomd.xml needs to be invalidated.
 
 As such, we have a highly-cacheable CDN of Fedora repositories, hosted on Cloudflare, with virtually
 no stale data whatsoever.
