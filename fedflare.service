@@ -1,6 +1,6 @@
 [Unit]
 Description=Sync Cloudflare Mirror of EPEL repos
-StartLimitBurst=0
+StartLimitIntervalSec=0
 
 [Service]
 ExecStart=/home/builder/fedflare/venv/bin/fedflare epel.cloud
