@@ -4,6 +4,7 @@ Description=Sync Cloudflare Mirror of EPEL repos
 [Service]
 ExecStart=/home/builder/fedflare/venv/bin/fedflare epel.cloud
 Restart=always
+RestartSec=500ms
 Type=simple
 User=builder
 

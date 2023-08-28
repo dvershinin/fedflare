@@ -41,3 +41,12 @@ fedflare domain.com
 By default, it will work (and currently only supports) EPEL repositories by Fedora.
 
 Live implementation can be found, and is much recommend for use: [epel.cloud](https://www.getpagespeed.com/server-setup/nginx/epel-powered-by-cloudflare-cdn-fix-your-sanity).
+
+### Example installation
+
+```bash
+cp /home/builder/fedflare/fedflare.service /etc/systemd/system/fedflare.service
+systemctl daemon-reload
+systemctl enable --now fedflare
+systemctl status fedflare
+```
