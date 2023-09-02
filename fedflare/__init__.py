@@ -64,9 +64,8 @@ def main():
 
         dirs_url = "https://dl.fedoraproject.org/pub/DIRECTORY_SIZES.txt"
         dirs_r = s.get(dirs_url, timeout=30)
-        if dirs_r.from_cache:
-            print('DIRECTORY_SIZES.txt unchanged, so repositories have not changed. Nothing to do, exiting.')
-            exit(0)
+        # This response may be unchanged even though repodata actually changed, simply in cases where repodata remains
+        # approximately the same size. So we need to check each repodata.xml file for freshness.
 
         all_repodata_uris = []
         for line in dirs_r.text.splitlines():
