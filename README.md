@@ -40,9 +40,14 @@ fedflare domain.com
 
 By default, it will work (and currently only supports) EPEL repositories by Fedora.
 
-Live implementation can be found, and is much recommend for use: [epel.cloud](https://www.getpagespeed.com/server-setup/nginx/epel-powered-by-cloudflare-cdn-fix-your-sanity).
+Live implementation can be found, and is much recommended for use: [epel.cloud](https://www.getpagespeed.com/server-setup/nginx/epel-powered-by-cloudflare-cdn-fix-your-sanity).
 
 ### Example installation
+
+First, `git clone` the project to home directory of a user, and set up Python 3.6 virtual environment
+in `venv` subdirectory of the cloned repository, and run `pip install -r requirements.txt`.
+
+Then, replace `<username>` with your username in the following commands and configs.
 
 ```bash
 cp /home/<username>/fedflare/fedflare.service /etc/systemd/system/fedflare.service
