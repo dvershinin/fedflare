@@ -45,7 +45,7 @@ Live implementation can be found, and is much recommend for use: [epel.cloud](ht
 ### Example installation
 
 ```bash
-cp /home/builder/fedflare/fedflare.service /etc/systemd/system/fedflare.service
+cp /home/<username>/fedflare/fedflare.service /etc/systemd/system/fedflare.service
 systemctl daemon-reload
 systemctl enable --now fedflare
 systemctl status fedflare
