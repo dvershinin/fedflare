@@ -21,7 +21,7 @@ install_requires = [
     'lockfile',
     # pin due to https://github.com/ionrock/cachecontrol/issues/292
     'urllib3 < 2',
-    "cloudflare"
+    "cloudflare",
 ]
 tests_requires = []
 

@@ -2,11 +2,15 @@
 Description=Sync Cloudflare Mirror of EPEL repos
 
 [Service]
-ExecStart=/home/<username>/fedflare/venv/bin/fedflare epel.cloud
+ExecStart=/home/<username>/fedflare/venv/bin/fedflare epel.cloud --service
 Restart=always
 RestartSec=3s
 Type=simple
 User=<username>
+# Limit resources
+CPUQuota=50%
+# Do not restart if there's a misconfiguration
+RestartPreventExitStatus=2
 
 [Install]
 WantedBy=multi-user.target
