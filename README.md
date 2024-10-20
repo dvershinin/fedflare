@@ -1,5 +1,8 @@
 # fedflare
 
+epel.cloud is a simple yet fast CDN for EPEL repositories, powered by [Cloudflare](https://www.cloudflare.com). 
+It is a mirror of EPEL repositories, with Cloudflare caching enabled.
+
 Python-based CLI app for cache invalidation and warm up for a Cloudflare mirror of Fedora repositories.
 
 The `fedflare` CLI program:
