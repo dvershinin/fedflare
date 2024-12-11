@@ -155,9 +155,10 @@ def main():
                     continue
                 if warm_r.headers["cf-cache-status"] == "DYNAMIC":
                     logging.error(
-                        "Got DYNAMIC cache status. Is Cache Everything rule active?"
+                        f"Got DYNAMIC cache status at {url}. Is Cache Everything rule active?"
                     )
-                    exit(2)
+                    # TODO: this happens even when Cache Everything is set. So we should not exit
+                    # Instead, we need to log response headers to Sentry or somewhere
                 logging.info(
                     f"Warmed %s and received Cloudflare cache status: %s",
                     url,
